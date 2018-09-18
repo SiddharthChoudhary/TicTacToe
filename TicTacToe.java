@@ -119,7 +119,7 @@ public class TicTacToe {
 				   2: Player 2 wins. */
 	   public int move(int row, int col, int player,int winning_sequence) {	
 		matrix[row][col]=player;
-		int front_row_count= 0,back_row_count=0,front_column_count=0,back_column_count=0,front_forward_diagonal_count=0,back_forward_diagonal_count=0,front_backward_diagonal_cout=0,back_backward_diagonal_count=0;
+		int front_row_count= 0, diagonal= 0,front_diagonal=0,back_row_count=0,front_column_count=0,back_column_count=0,front_forward_diagonal_count=0,back_forward_diagonal_count=0,front_backward_diagonal_cout=0,back_backward_diagonal_count=0;
 		if(matrix[row][col]==-1){
 			System.out.println("Wrong place");
 			return -1;
@@ -138,23 +138,23 @@ public class TicTacToe {
 				System.out.println("Everything is fine"+front_row_count);
 				front_row_count++;
 			   }   
-			   if(win&&front_row_count==winning_sequence) return player;
+			   if(win && front_row_count==winning_sequence) return player;
 		   }
-		   //row traversing backward
-		   win=true;
-		   for(int i=matrix.length-1; i>=0; i--){
-			   if(matrix[row][i]!=player&&matrix[row][i]!=-1){
-					win=false;
-					back_row_count=0;
-				System.out.println("Everthong is not fine"+back_row_count);
-					break;
-			   }
-			   if(matrix[row][i]==player){
-				System.out.println("Everything is fine"+back_row_count);
-				back_row_count++;
-			   }   
-			   if(win&&back_row_count==winning_sequence) return player;
-		   }		
+		//    //row traversing backward
+		//    win=true;
+		//    for(int i=matrix.length-1; i>=0; i--){
+		// 	   if(matrix[row][i]!=player&&matrix[row][i]!=-1){
+		// 			win=false;
+		// 			back_row_count=0;
+		// 		System.out.println("Everthong is not fine"+back_row_count);
+		// 			break;
+		// 	   }
+		// 	   if(matrix[row][i]==player){
+		// 		System.out.println("Everything is fine"+back_row_count);
+		// 		back_row_count++;
+		// 	   }   
+		// 	   if(win&&back_row_count==winning_sequence) return player;
+		//    }		
 		   //checking column traversing forward
 		   win=true;
 		   for(int i=0; i<matrix.length; i++){
@@ -170,20 +170,69 @@ public class TicTacToe {
 		   }
 
 		   //checking column by traversing backward
-		   win=true;
-		   for(int i=matrix.length-1; i>=0; i--){
-			   if(matrix[i][col]!=player&&matrix[i][col]!=-1){
-				   win=false;
-				   back_column_count=0;
-				   break;
-			   }
-			    if(matrix[i][col]==player){
-					back_column_count++;
-			}
-			if(win&&back_column_count==winning_sequence) return player;
-		   }
+		//    win=true;
+		//    for(int i=matrix.length-1; i>=0; i--){
+		// 	   if(matrix[i][col]!=player&&matrix[i][col]!=-1){
+		// 		   win=false;
+		// 		   back_column_count=0;
+		// 		   break;
+		// 	   }
+		// 	    if(matrix[i][col]==player){
+		// 			back_column_count++;
+		// 	}
+		// 	if(win&&back_column_count==winning_sequence) return player;
+		//    }
+		   int rowtraversing = row;
+		   int column_traversing=col;
+	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
+		if(matrix[rowtraversing][column_traversing]!=player){
+			break;
+		}
+		if(matrix[rowtraversing][column_traversing]==player){
+			diagonal++;
+		}
+		rowtraversing++;
+		column_traversing++;
+	}
+	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
+		System.out.println("Hey");
+		if(matrix[rowtraversing][column_traversing]!=player){
+			break;
+		}
+		if(matrix[rowtraversing][column_traversing]==player){
+			diagonal++;
+		}
+		rowtraversing--;
+		column_traversing--;
+	}
+	if(diagonal==winning_sequence){
+		return player;
+	}
 
-		   //checking diagonal while traversing forward
+	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
+		if(matrix[rowtraversing][column_traversing]!=player){
+			break;
+		}
+		if(matrix[rowtraversing][column_traversing]==player){
+			front_diagonal++;
+		}
+		rowtraversing--;
+		column_traversing++;
+	}
+	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
+		if(matrix[rowtraversing][column_traversing]!=player){
+			break;
+		}
+		if(matrix[rowtraversing][column_traversing]==player){
+			front_diagonal++;
+		}
+		rowtraversing++;
+		column_traversing--;
+	}
+	if(front_diagonal==winning_sequence){
+		return player;
+	}
+		//checking diagonal while traversing forward
 		   win=true;
 		   for(int i=0; i<matrix.length; i++){
 			   if(matrix[i][i]!=player&&matrix[i][i]!=-1){
@@ -212,25 +261,21 @@ public class TicTacToe {
 	 }
 	 
 		
-	//  win =true;
-	// int row_for_traversing = row;
-	//  for(int i=row;i<matrix.length;i++){
-	// 	 for(int j=col;j<matrix.length;j++){
-	// 		if(matrix[i][j]!=player){
-	// 			win=false;
-	// 			count=0;
-	// 			break;
-	// 		} 
-	// 		if(matrix[i][j]==player){
-	// 			 count++;
-	// 		 }
-	// 			break;
-	// 	 }
-	// 	 if(!win){
-	// 		 break;
-	// 	 }
-	// 	 if(win&&count==winning_sequence) return player;
-	//  }
+	//   win =true;
+	//   for(int j=0;j<matrix.length;j++){
+	// 	  for(int i=0;i<j;i++){
+	// 		  if(matrix[i][j+i]!=player&&matrix[i][j+i]!=-1){
+	// 			  win=false;
+	// 			  diagonal=0;
+	// 			  break;
+	// 		  }
+	// 		  if(matrix[i][j+i]==player){
+	// 			  diagonal++;
+	// 		  }
+	// 		if(win&&diagonal==winning_sequence) return player;			
+	// 		}
+	//   }	
+
 	 //check backward diagonal while traversing forward
 		   win=true;
 		   for(int i=0; i<matrix.length; i++){
@@ -243,20 +288,7 @@ public class TicTacToe {
 				front_backward_diagonal_cout++;
 			}
 			if(win&&front_backward_diagonal_cout==winning_sequence) return player;
-		}	
-//checking backward diagonal by traversing backward
-		win=true;
-		for(int i=matrix.length-1; i>=0; i--){
-			if(matrix[i][matrix.length-i-1]!=player&&matrix[i][matrix.length-i-1]!=-1){
-			 win=false;
-			 back_backward_diagonal_count=0;
-				break;
-			} 
-			if(matrix[i][matrix.length-i-1]==player){
-				back_backward_diagonal_count++;
-		 }
-		 if(win&&back_backward_diagonal_count==winning_sequence) return player;
-	 }	
+		}		
 		   return -1;
    }
 }
