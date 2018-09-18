@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -44,15 +47,24 @@ public class TicTacToe {
 
 		while(true){
 		for(i=0;i<noOfPlayers;i++){
-			System.out.println();
+            System.out.println();
+            int[] rowColumnArray = new int[3];
 			System.out.println("Player "+playerArrays[i]);
-			System.out.println("Enter row number");
-			userInput = new Scanner(System.in);
-			row   = userInput.nextInt();
-			System.out.println("Enter column number");
-			userInputcolumn = new Scanner(System.in);
-			column = userInputcolumn.nextInt();
-			if(row<boardsize&&column<boardsize){
+            try{
+            System.out.println("Enter row and column number");
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            String  row_and_column = input.readLine();        
+            String[] strings = row_and_column.trim().split("\\s+");
+            for (int k = 0; k < strings.length; k++) {
+            rowColumnArray[k] = Integer.parseInt(strings[i]);
+            }
+            row   = (rowColumnArray[0]-1);
+            column= (rowColumnArray[1]-1);
+            System.out.println("Row and COlum"+rowColumnArray[0]+""+rowColumnArray[1]);
+        }catch(IOException e){
+            System.out.println("Try again, you have input something wrong!!");
+        }
+            if(row<boardsize&&column<boardsize){
 				winner = t.move(row,column,i,winning_seq);
 				printBoard();
 			}else{
@@ -118,177 +130,96 @@ public class TicTacToe {
 				   1: Player 1 wins.
 				   2: Player 2 wins. */
 	   public int move(int row, int col, int player,int winning_sequence) {	
-		matrix[row][col]=player;
-		int front_row_count= 0, diagonal= 0,front_diagonal=0,back_row_count=0,front_column_count=0,back_column_count=0,front_forward_diagonal_count=0,back_forward_diagonal_count=0,front_backward_diagonal_cout=0,back_backward_diagonal_count=0;
-		if(matrix[row][col]==-1){
-			System.out.println("Wrong place");
-			return -1;
-		}		 
-		   //check row traversing forward
-		   boolean win=true;
-		   for(int i=0; i<matrix.length; i++){
-			//loop should traverse when going over the row by checking that it's not empty or is not equal to desired player   
-			if(matrix[row][i]!=player&&matrix[row][i]!=-1){
-					win=false;
-					front_row_count=0;
-				System.out.println("Everthong is not fine"+front_row_count);
-					break;
-			   }
-			   if(matrix[row][i]==player){
-				System.out.println("Everything is fine"+front_row_count);
-				front_row_count++;
-			   }   
-			   if(win && front_row_count==winning_sequence) return player;
-		   }
-		//    //row traversing backward
-		//    win=true;
-		//    for(int i=matrix.length-1; i>=0; i--){
-		// 	   if(matrix[row][i]!=player&&matrix[row][i]!=-1){
-		// 			win=false;
-		// 			back_row_count=0;
-		// 		System.out.println("Everthong is not fine"+back_row_count);
-		// 			break;
-		// 	   }
-		// 	   if(matrix[row][i]==player){
-		// 		System.out.println("Everything is fine"+back_row_count);
-		// 		back_row_count++;
-		// 	   }   
-		// 	   if(win&&back_row_count==winning_sequence) return player;
-		//    }		
-		   //checking column traversing forward
-		   win=true;
-		   for(int i=0; i<matrix.length; i++){
-			   if(matrix[i][col]!=player&&matrix[i][col]!=-1){
-				   win=false;
-				   front_column_count=0;
-				   break;
-			   }
-			    if(matrix[i][col]==player){
-					front_column_count++;
-			}
-			if(win&&front_column_count==winning_sequence) return player;
-		   }
-
-		   //checking column by traversing backward
-		//    win=true;
-		//    for(int i=matrix.length-1; i>=0; i--){
-		// 	   if(matrix[i][col]!=player&&matrix[i][col]!=-1){
-		// 		   win=false;
-		// 		   back_column_count=0;
-		// 		   break;
-		// 	   }
-		// 	    if(matrix[i][col]==player){
-		// 			back_column_count++;
-		// 	}
-		// 	if(win&&back_column_count==winning_sequence) return player;
-		//    }
-		   int rowtraversing = row;
-		   int column_traversing=col;
-	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
-		if(matrix[rowtraversing][column_traversing]!=player){
-			break;
-		}
-		if(matrix[rowtraversing][column_traversing]==player){
-			diagonal++;
-		}
-		rowtraversing++;
-		column_traversing++;
-	}
-	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
-		System.out.println("Hey");
-		if(matrix[rowtraversing][column_traversing]!=player){
-			break;
-		}
-		if(matrix[rowtraversing][column_traversing]==player){
-			diagonal++;
-		}
-		rowtraversing--;
-		column_traversing--;
-	}
-	if(diagonal==winning_sequence){
-		return player;
-	}
-
-	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
-		if(matrix[rowtraversing][column_traversing]!=player){
-			break;
-		}
-		if(matrix[rowtraversing][column_traversing]==player){
-			front_diagonal++;
-		}
-		rowtraversing--;
-		column_traversing++;
-	}
-	while((rowtraversing>=0&&rowtraversing<matrix.length)&&(column_traversing>=0&&column_traversing<matrix.length)){
-		if(matrix[rowtraversing][column_traversing]!=player){
-			break;
-		}
-		if(matrix[rowtraversing][column_traversing]==player){
-			front_diagonal++;
-		}
-		rowtraversing++;
-		column_traversing--;
-	}
-	if(front_diagonal==winning_sequence){
-		return player;
-	}
-		//checking diagonal while traversing forward
-		   win=true;
-		   for(int i=0; i<matrix.length; i++){
-			   if(matrix[i][i]!=player&&matrix[i][i]!=-1){
-				win=false;
-				front_forward_diagonal_count=0;
-				   break;
-			   } 
-			   if(matrix[i][i]==player){
-				front_forward_diagonal_count++;
-			}
-			if(win&&front_forward_diagonal_count==winning_sequence) return player;
-		}
-
-		// checking diagonal while traversing backward
-		win=true;
-		for(int i=matrix.length-1; i>=0; i--){
-			if(matrix[i][i]!=player&&matrix[i][i]!=-1){
-			 win=false;
-			 back_forward_diagonal_count=0;
-				break;
-			} 
-			if(matrix[i][i]==player){
-				back_forward_diagonal_count++;
-		 }
-		 if(win&&back_forward_diagonal_count==winning_sequence) return player;
-	 }
-	 
-		
-	//   win =true;
-	//   for(int j=0;j<matrix.length;j++){
-	// 	  for(int i=0;i<j;i++){
-	// 		  if(matrix[i][j+i]!=player&&matrix[i][j+i]!=-1){
-	// 			  win=false;
-	// 			  diagonal=0;
-	// 			  break;
-	// 		  }
-	// 		  if(matrix[i][j+i]==player){
-	// 			  diagonal++;
-	// 		  }
-	// 		if(win&&diagonal==winning_sequence) return player;			
-	// 		}
-	//   }	
-
-	 //check backward diagonal while traversing forward
-		   win=true;
-		   for(int i=0; i<matrix.length; i++){
-			   if(matrix[i][matrix.length-i-1]!=player&&matrix[i][matrix.length-i-1]!=-1){
-				win=false;
-				front_backward_diagonal_cout=0;
-				   break;
-			   } 
-			   if(matrix[i][matrix.length-i-1]==player){
-				front_backward_diagonal_cout++;
-			}
-			if(win&&front_backward_diagonal_cout==winning_sequence) return player;
-		}		
-		   return -1;
-   }
+        matrix[row][col]=player;
+        int right_count = checkright(row,col,player,0);
+        int left_count  = checkleft(row,col,player,0);
+        int top_count   = checktop(row,col,player,0);
+        int down_count= checkdown(row,col,player,0);
+        int top_left = top_left(row,col,player,0);
+        int top_right = top_right(row,col,player,0);
+        int down_left= down_left(row, col, player, 0);
+        int down_right=down_right(row, col, player, 0);
+        System.out.println("COunt is"+left_count);
+        if((left_count+right_count-1)==winning_sequence){
+         System.out.println("COunt is"+(left_count+right_count));
+            return player;
+        }
+        if((top_count+down_count-1)==winning_sequence){
+            System.out.println("COunt is"+(top_count+down_count));
+               return player;
+        }
+        if((top_right+down_left-1)==winning_sequence){
+            System.out.println("COunt is"+(top_right+down_left));
+               return player;
+        }
+        if((top_left+down_right-1)==winning_sequence){
+            System.out.println("COunt is"+(top_left+down_right));
+               return player;
+        }
+        return -1;
+    }
+    public int checkleft(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+            if(matrix[row][column]==player){
+                count = checkleft(row,--column,player,++count);
+            }
+        }
+            return count;
+        }    
+        public int checkright(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = checkright(row,++column,player,++count);
+                }
+            }
+                return count;        
+        }
+        public int checktop(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = checktop(--row,column,player,++count);
+                }
+            }
+                return count;
+        }
+        public int checkdown(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = checkdown(++row,column,player,++count);
+                }
+            }
+                return count;
+        }
+        public int top_left(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = top_left(--row,--column,player,++count);
+                }
+            }
+                return count;
+        }
+        public int top_right(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = top_right(--row,++column,player,++count);
+                }
+            }
+                return count;
+        }
+        public int down_left(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = down_left(++row,--column,player,++count);
+                }
+            }
+                return count;
+        }
+        public int down_right(int row, int column,int player,int count){
+            if(row>=0&&row<boardsize&&column>=0&&column<boardsize){
+                if(matrix[row][column]==player){
+                    count = down_right(++row,++column,player,++count);
+                }
+            }
+                return count;
+            }
 }
