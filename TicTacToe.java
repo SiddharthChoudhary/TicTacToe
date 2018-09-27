@@ -14,132 +14,205 @@ import javax.sound.midi.SysexMessage;
 
 
 public class TicTacToe {
-	static int winner;
+	static int winner=-1;
 	static char playerArrays[] = new char[]{'X','O','A','B','C','D','E','F','G','H','I','J','K','L','M','N','P','Q','R','S','T','U','V','W','Y','Z'};
 	static int row;
 	static int column;
     static int boardsize;
     static int noOfPlayers;
+    static int player=-1;
     static int winning_seq;
     static TicTacToe t;
-	static int[][] matrix;
+    static int[][] matrix;
+    public boolean resumed=false;
+    public static final int ERROR_ALREADY_OCCUPIED=-2;
+    public static final int ERROR_INPUT_ERROR          =-1;
 	public static void main(String args[]){
         int i=1;	
-		try{
+        char ch;
+        t=new TicTacToe();
         System.out.println("Start a new game or resume, r for resume, n for newgame");
         Scanner startNewGameOrResume = new Scanner(System.in);
         char choice = startNewGameOrResume.next().charAt(0);
         if(choice=='r'){
-        System.out.println("Enter the filename");
-        Scanner filename = new Scanner(System.in);
-        int[][] matrixFromGame = resumeAgame(filename.next());
-        if(matrixFromGame!=null){
-            matrix=matrixFromGame; 
-            boardsize=matrixFromGame.length;
-            printBoard();
+          t.saveResumeFromFileModule();
+          t.gameStart(noOfPlayers,winner,playerArrays);
         }
+        if(choice=='n'){
+            t.gameConstraints();
+            t.gameStart(noOfPlayers,winner,playerArrays);
         }
-        System.out.println("Starting a new game"); 
-		System.out.println("Enter size of the board");
-		Scanner sizeOfBoard = new Scanner(System.in);
-		boardsize     = sizeOfBoard.nextInt();
-        while(boardsize>999){
-			if(boardsize>999){
-		System.out.println("Boardsize is greater than 999, Try again");			
-		sizeOfBoard = new Scanner(System.in);
-		boardsize     = sizeOfBoard.nextInt();		
-			}
-		}
-		t = new TicTacToe(boardsize);
-		System.out.println("Enter number of Players");
-		Scanner NumberOfPlayers = new Scanner(System.in);
-		int noOfPlayers 		= NumberOfPlayers.nextInt();	 
-		while(noOfPlayers>26){
-			if(noOfPlayers>26){
-			System.out.println("Game is limited to 26 members only, Try again");
-			NumberOfPlayers =  new Scanner(System.in);
-			noOfPlayers = NumberOfPlayers.nextInt();	
-		}
-	}
-		System.out.println("Enter winning sequence");
-		Scanner winning_sequence = new Scanner(System.in);
-		int winning_seq 		= winning_sequence.nextInt();	 
-        while(true){
-		for(i=0;i<noOfPlayers;i++){
-            System.out.println();
-            quitGame();
-            int[] rowColumnArray = new int[3];
+        
+    }
+        int saveResumeFromFileModule(){
+            System.out.println("Enter the filename");
+            Scanner filename = new Scanner(System.in);
+            int[][] matrixFromGame = t.resumeAgame(filename.next());
+            if(matrixFromGame!=null){
+                matrix=matrixFromGame; 
+                boardsize=matrixFromGame.length;
+                t.resumed=true;
+                printBoard();
+            }
+            return 0;
+        }
+        void gameConstraints(){
+            //saveResumeFromFileModule();
+            System.out.println("Starting a new game"); 
+            System.out.println("Enter size of the board");
+            Scanner sizeOfBoard = new Scanner(System.in);
+            boardsize     = sizeOfBoard.nextInt();
             
-            System.out.println("Player "+playerArrays[i]);
-            System.out.println("Enter row and column number");
-            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-            String  row_and_column = input.readLine();        
-            String[] strings = row_and_column.trim().split("\\s+");
-            for (int k = 0; k < strings.length; k++) {
-            rowColumnArray[k] = Integer.parseInt(strings[k]);
+            while(boardsize>999){
+                if(boardsize>999){
+            System.out.println("Boardsize is greater than 999, Try again");			
+            sizeOfBoard = new Scanner(System.in);
+            boardsize     = sizeOfBoard.nextInt();		
+                }
             }
-            if(rowColumnArray.length!=2){
-                row   = (rowColumnArray[0]-1);
-                column= (rowColumnArray[1]-1);
-            }else{
-                System.out.println("Try again with better inputs");
+            matrix = new int[boardsize][boardsize];
+            for(int i=0;i<boardsize;i++){
+                for(int j=0;j<boardsize;j++){
+                    matrix[i][j]=-1;
+                }
             }
-            if(row<boardsize&&column<boardsize){
-				winner = t.move(row,column,i,winning_seq);
-				printBoard();
-			}else{
-				System.out.println("TRY AGAIN");
-				--i;	
-				}
-				if(winner!=-1){
-					break;
-				}
-			}		
-		
-			if(winner!=-1){				
-			break;
-			}
-	}
+        
+            System.out.println("Enter number of Players");
+            Scanner NumberOfPlayers = new Scanner(System.in);
+            noOfPlayers 		= NumberOfPlayers.nextInt();	 
+            while(noOfPlayers>26){
+                if(noOfPlayers>26){
+                System.out.println("Game is limited to 26 members only, Try again");
+                NumberOfPlayers =  new Scanner(System.in);
+                noOfPlayers = NumberOfPlayers.nextInt();	
+            }
+        }
+            System.out.println("Enter winning sequence");
+            Scanner winning_sequence = new Scanner(System.in);
+            winning_seq 		= winning_sequence.nextInt(); 
+        }
 
-		System.out.println("The winner is Player "+playerArrays[i]);		
-		}catch(IOException|ArrayIndexOutOfBoundsException|InputMismatchException e){
-            e.printStackTrace();
-            System.out.println("Wrong Input type");
-
-		}
-		}
+        void gameStart(int noOfPlayers,int winner,char playerArrays[]){
+         try{
+             int i=0; 
+            while(true){
+                 //starting from the position which is saved in the file already and retrieving the player from the file
+                
+                if(t.resumed&&player!=-1){
+                    i = player;
+                    t.resumed=false;
+                }else{
+                    i=0;
+                }
+                mainloop:
+                 for(;i<noOfPlayers;i++){
+                    System.out.println();
+                    int[] rowColumnArray = new int[3];
+                    player = i; 
+                    System.out.println("Player "+playerArrays[i]);
+                    System.out.println("Enter row and column number");
+                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                    String  row_and_column = input.readLine();        
+                    String[] strings = row_and_column.trim().split("\\s+");
+                    if(strings.length==1){
+                        if(strings[0].length()==1){
+                            if(strings[0].charAt(0)=='q'){
+                                int x= t.quitGame();
+                                if(x!=-1){
+                                    t.resumed=true;
+                                    continue mainloop;
+                                };
+                            }
+                        }
+                            else{
+                                System.out.println("Try again with the inputs");
+                                --i;
+                                continue mainloop;
+                            }
+                    }
+                    if(strings.length==2){
+                    for (int k = 0; k < strings.length; k++) {
+                    rowColumnArray[k] = Integer.parseInt(strings[k]);
+                    }
+                    if(rowColumnArray.length!=2){
+                        row   = (rowColumnArray[0]-1);
+                        column= (rowColumnArray[1]-1);
+                    }
+                    else{
+                        System.out.println("Try again with better inputs");
+                    }
+                
+                    if(row<boardsize&&column<boardsize){
+                        winner = t.move(row,column,i,winning_seq);
+                        if(winner==ERROR_ALREADY_OCCUPIED){
+                        --i;
+                        System.out.println("At Wrong place");
+                        continue mainloop;    
+                        }
+                        printBoard();
+                    }else{
+                        System.out.println("TRY AGAIN");
+                        --i;
+                        continue mainloop;	
+                        }
+                        if(winner!=-1){
+                            break;
+                        }
+                    } 
+                    if(winner!=-1){
+                        break;
+                    }
+                }
+                    if(winner!=-1){				
+                        break;    
+                }
+            }
+        System.out.println("The winner is Player "+playerArrays[i]);		
+    }catch(IOException|ArrayIndexOutOfBoundsException|InputMismatchException e){
+        e.printStackTrace();
+        System.out.println("Wrong Input type");
+    }
+    } 
 	static void printBoard() {
+        //print a space
+        System.out.print(" ");
 		for(int i=1;i<=boardsize;i++){
-		System.out.print("  "+i+" | ");
+		System.out.print("  "+i+" ");
 		}
 		System.out.println();
 		for	(int i=1;i<=boardsize;i++){
-		System.out.print(" "+i+"  ");
+		System.out.print(i+" ");
 		for(int iq=1;iq<=boardsize;iq++){
-		System.out.print("  "+(matrix[i-1][iq-1] == -1?" |":playerArrays[matrix[i-1][iq-1]]+" |"));
-		}
-		System.out.println();
-		for(int iw=1;iw<=boardsize;iw++){
-		if(iw!=boardsize){
-			System.out.print(" _ _ +");
-		}else{
-			System.out.print(" _ _ ");
-		}}
+        if(iq!=boardsize){
+            System.out.print(" "+(matrix[i-1][iq-1] == -1?"  |":playerArrays[matrix[i-1][iq-1]]+" |"));
+        }
+        if(iq==boardsize){
+            System.out.print(" "+(matrix[i-1][iq-1] == -1?"  ":playerArrays[matrix[i-1][iq-1]]));
+        }
+    }
+    	System.out.println();
+        if(i!=boardsize){
+        for(int iw=1;iw<boardsize;iw++){
+        if(iw==1){
+            System.out.print("  ---+");
+        }
+        if(iw!=boardsize-1){
+			System.out.print("---+");
+        }
+        if(iw==boardsize-1){
+			System.out.print("---");
+        }
+    }
+    }
 		System.out.println();
 		
 	}
 }
-	   /** Initialize your data structure here. */
-	   public TicTacToe(int n) {
-		   matrix = new int[n][n];
-		for(int i=0;i<n;i++){
-			for(int j=0;j<n;j++){
-				matrix[i][j]=-1;
-			}
-		}
-        }
 
 	   public int move(int row, int col, int player,int winning_sequence) {	
+        if(matrix[row][col]!=-1){
+            return ERROR_ALREADY_OCCUPIED;
+        }
         matrix[row][col]=player;
         int right_count = checkright(row,col,player,0);
         int left_count  = checkleft(row,col,player,0);
@@ -230,6 +303,12 @@ public class TicTacToe {
         public static boolean saveInfile(int[][] matrix,String path, String filename){
            try{
             StringBuilder builder = new StringBuilder();
+            builder.append("noOfPlayers:"+noOfPlayers+"\n");
+            builder.append("savedByPlayer:"+player+"\n");
+            builder.append("boardSize:"+boardsize+"\n");
+            builder.append("winning_sequence:"+winning_seq+"\n");
+            builder.append("Matrix"+"\n");
+            
             for(int i = 0; i < matrix.length; i++)//for each row
             {
                for(int j = 0; j < matrix.length; j++)//for each column
@@ -250,7 +329,7 @@ public class TicTacToe {
             return false;
         }
         }
-        public static int quitGame(){
+        public int quitGame(){
             System.out.println("Do you want to quit the game? Press q for quit, n for Don't quit and continue");
             Scanner quitOrNot = new Scanner(System.in);
             char ch = quitOrNot.next().charAt(0);
@@ -267,7 +346,7 @@ public class TicTacToe {
                         System.exit(0);
                     }else{
                         System.out.println("Couldn't save successfully");
-                        return -1;
+                        return player;
                     }
                 }
                 if(saveOrnot=='n'){
@@ -279,28 +358,56 @@ public class TicTacToe {
                 }
             }
             if(ch=='n'){
-               return -1;
+               return player;
             }
-            return -1;
+            return player;
         }
-        public static int[][] resumeAgame(String filename){
+        public int[][] resumeAgame(String filename){
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filename+".txt"));
             String line = "";
-            int row = 0,column=0;
+            int row = 0,column=0,count=0;
+            boolean matrix_starting=false;
             while((line = reader.readLine()) != null)
             {   
-               String[] cols = line.split(","); //note that if you have used space as separator you have to split on " "
-               column = cols.length;
-               row++;
+                count++;
+                if(count==1){
+                    String[] noOfPlayer = line.split(":",3);
+                    noOfPlayers         = Integer.parseInt(noOfPlayer[1]);
+                }      
+                if(count==2){
+                    String[] playerChance = line.split(":",2);
+                    player          = Integer.parseInt(playerChance[1]);
+                } 
+                if(count==3){
+                    String[] boardSize = line.split(":",2);
+                    boardsize          = Integer.parseInt(boardSize[1]);
+                }      
+    
+                if(count==4){
+                    String[] winning_sequence = line.split(":",2);
+                    winning_seq               = Integer.parseInt(winning_sequence[1]);
+                }      
+                if(line.matches("^Matrix")){
+                   matrix_starting = true;
+                   continue;
+                }   
+                if(matrix_starting){
+                    String[] cols = line.split(","); 
+                    column        = cols.length;
+                    row++;
+                }
             }
+            
             int[][] board = new int[row][column];            
             BufferedReader readeragain = new BufferedReader(new FileReader(filename+".txt"));
             line = "";
             row=0;   
+            count=0;
             while((line = readeragain.readLine()) != null)
-                {               
-                    String[] cols = line.split(","); //note that if you have used space as separator you have to split on " "
+                {   count++;           
+                    if(count>5){ 
+                    String[] cols = line.split(","); 
                     int col = 0;
                     for(String  c : cols)
                     {
@@ -309,6 +416,7 @@ public class TicTacToe {
                     }
                     row++;
                 }
+            }
                     reader.close();
                     return board;
         }catch(IOException e){

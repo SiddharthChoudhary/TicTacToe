@@ -1,0 +1,10 @@
+noOfPlayers:3
+savedByPlayer:2
+boardSize:5
+winning_sequence:3
+Matrix
+-1,-1,2,-1,-1
+-1,0,0,-1,-1
+-1,-1,1,2,-1
+-1,-1,-1,-1,-1
+-1,1,-1,-1,-1

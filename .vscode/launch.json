@@ -6,6 +6,7 @@
             "type": "java",
             "request": "launch",
             "stopOnEntry": true,
+            "mainClass":"TicTacToe",
             "jdkPath": "${env:JAVA_HOME}/bin",
             "cwd": "${fileDirname}",
             "startupClass": "${fileBasenameNoExtension}",
